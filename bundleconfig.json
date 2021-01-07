@@ -1,0 +1,85 @@
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "wwwroot/css/site.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/index.min.js",
+    "inputFiles": [
+      "wwwroot/js/index.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/index.min.js",
+    "inputFiles": [
+      "wwwroot/js/index.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/editor/editor.min.js",
+    "inputFiles": [
+      "wwwroot/js/editor/editor.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/aboutus/aboutus.min.js",
+    "inputFiles": [
+      "wwwroot/js/aboutus/aboutus.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/news/newsDetail.min.js",
+    "inputFiles": [
+      "wwwroot/js/news/newsDetail.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/customerCase/customerCaseDetail.min.js",
+    "inputFiles": [
+      "wwwroot/js/customerCase/customerCaseDetail.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/odm/odmDetail.min.js",
+    "inputFiles": [
+      "wwwroot/js/odm/odmDetail.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]

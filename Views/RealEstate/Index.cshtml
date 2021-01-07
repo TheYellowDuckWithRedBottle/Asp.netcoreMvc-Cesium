@@ -1,0 +1,28 @@
+﻿@{ Layout = null;
+                ViewData["Title"] = "地图"; }
+<script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+
+<script src="~/js/Cesium.js"></script>
+<link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+<script src="~/js/lib/require.min.js"></script>
+<script src="~/js/index.js"></script>
+
+
+<nav role="navigation" class="navbar bg-dark " style="background:black;margin-bottom:0px">
+    <div class="container-fluid">
+        <a class="navbar-brand " asp-area="" asp-controller="Home" asp-action="Index"></a>
+      
+    </div>
+</nav>
+
+
+<div id="cesiumContainer">
+    <div style="position:absolute; z-index:3">
+    </div>
+</div>
+
+<script type="text/javascript">
+    var viewer=init(Cesium);
+</script>
+
+

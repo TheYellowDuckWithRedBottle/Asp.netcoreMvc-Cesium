@@ -1,0 +1,25 @@
+﻿@{ Layout = null;
+    ViewData["Title"] = "地图展示"; }
+<link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+<script src="~/js/Cesium.js"></script>
+<script src="~/js/index.js"></script>
+<div>
+</div>
+<div id="cesiumContainer">
+    <div style="position:absolute; z-index:3">
+    </div>
+</div>
+<div>
+    <div id="cesiumContainer">
+        <div style="position:absolute; z-index:3">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var viewer = init1(Cesium);
+        var BuildingNos = document.getElementsByClassName("Nos").value
+        var RoomIds = document.getElementsByClassName("RoomId").value
+    </script>
+</div>
+
+
+

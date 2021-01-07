@@ -1,0 +1,103 @@
+﻿@{ Layout = null;
+    ViewData["Title"] = "地图"; }
+@model Mapping
+    <environment include="Development">
+        <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+        <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/Cesium.js"></script>
+        <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+        <script src="~/js/index.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+        <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/Cesium.js"></script>
+        <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+        <script src="~/js/index.min.js"></script>
+    </environment>
+    <nav role="navigation" class="navbar bg-dark " style="background:white;margin:20px 10px 0px 20px;position:absolute;z-index:4">
+        <div class="form-check">
+            <input id="Nos" class="form-check-input" type="radio" name="exampleRadios" value="@Model.BuildingNo" checked>
+            <label class="form-check-label" for="Nos">幢号:@Model.BuildingNo</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input id="RoomId" class="form-check-input" type="radio" name="exampleRadios" value="@Model.RoomId">
+            <label class="form-check-label" for="RoomId">房间号:@Model.RoomId</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input position-static" type="checkbox" id="blankCheckbox" disabled>
+            <label class="form-check-label" for="blankCheckbox">产权</label>
+        </div>
+    </nav>
+    <div id="cesiumContainer">
+        <div style="position:absolute; z-index:3">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var viewer = init(Cesium);
+        var BuildingNo = document.getElementById("Nos").value
+        var RoomId = document.getElementById("RoomId").value
+        var floor
+        //var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
+        //var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
+        var urlST = `http://localhost:5052/DATA/SWDJ/321300/001013GB00858/ST/${BuildingNo}/tileset.json`
+        var urlCQ = `http://localhost:5052/DATA/SWDJ/321300/001013GB00858/CQ/${BuildingNo}/tileset.json`
+        var Tiles = add3DTilesetData(viewer, urlST);
+        //var Tiles = add3DTilesetData(viewer, urlCQ);
+       
+        $("#Nos").click(function () {
+            {
+                removeAllTiles(viewer);
+                add3DTilesetData(viewer, urlST);
+                $("#blankCheckbox")[0].disabled = true
+                $("#blankCheckbox")[0].checked = false
+
+            }
+        })
+        $("#RoomId").bind("click", function () {
+            var selectValue = $(this).val();
+            $("#blankCheckbox")[0].disabled = false
+            //var RoomArray = selectValue.split('0')
+            var RoomArray = selectValue.split('-')
+            var floorNo = RoomArray[0]
+            floor=floorNo
+           
+            console.log(floorNo)
+            let tileStyleFloor = set3DTileStyle("Floor", floorNo)
+            addPickEntity(viewer, [
+                [urlST, tileStyleFloor]
+
+            ])
+
+        })
+
+        $("#blankCheckbox").click(function () {
+            if ($(this).prop("checked")) {
+                removeAllTiles(viewer);
+                //var RoomArray = RoomId.split('0')
+              
+                console.log(RoomId)
+               // var floorNo = RoomArray[0]
+               // let tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
+                let tileStyleRoom = set3DTileStyle("name", RoomId)
+                let tileStyleFloor = set3DTileStyle("Floor", floor)
+                addPickEntity(viewer, [
+                    [urlST, tileStyleFloor],
+                    [urlCQ, tileStyleRoom]
+                ])
+            } else {
+                removeAllTiles(viewer);
+                var RoomArray = RoomId.split('-')
+                var floorNo = RoomArray[0]
+                let tileStyleFloor = set3DTileStyle("floor", floorNo)
+                addPickEntity(viewer, [
+                    [urlST, tileStyleFloor]
+
+                ])
+            }
+        })
+    </script>
+
+

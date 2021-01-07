@@ -1,0 +1,229 @@
+﻿@{ Layout = null;
+    ViewData["Title"] = "地图"; }
+@model RealEstate
+<script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+<link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="~/lib/bootstrap-treeview/bootstrap-treeview.js"></script>
+<script src="~/js/Cesium.js"></script>
+<link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+<script src="~/js/lib/require.min.js"></script>
+<script src="~/js/index.js"></script>
+
+<nav role="navigation" class="navbar bg-dark " style="background:white;margin:20px 10px 0px 20px;position:absolute;z-index:4">
+    <div class="form-check">
+        <input id="Nos" class="form-check-input" type="radio" name="exampleRadios" value="@Model.BuildingNo" checked>
+        <label style="font-size:30px;" class="form-check-label" for="Nos">幢:@Model.BuildingNo</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input id="RoomId" class="form-check-input" hidden type="radio" name="exampleRadios" value="@Model.RoomId">
+        <label style="font-size:30px;" class="form-check-label" for="RoomId"></label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input position-static" hidden type="checkbox" id="blankCheckbox" disabled>
+        <label style="font-size:30px;" class="form-check-label" for="blankCheckbox"></label>
+    </div>
+</nav>
+
+<div id="cesiumContainer">
+    <div style="position:absolute; z-index:3">
+    </div>
+</div>
+<script type="text/javascript">
+    var viewer = init(Cesium);
+    var BuildingNo = document.getElementById("Nos").value
+    var RoomId = document.getElementById("RoomId").value
+    var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
+    var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
+    var Tiles = add3DTilesetData(viewer, urlST);
+    //var Tiles = initView(viewer, urlST);
+    $("#Nos").click(function () {
+        {
+            removeAllTiles(viewer);
+            var selectValue = $("#RoomId").val()
+            $("#blankCheckbox")[0].disabled = false
+            var RoomArray = selectValue.split('0')
+            var floorNo = RoomArray[0]
+            let tileStyleFloor = set3DTileStyleSTFloor("floor", floorNo)
+            addPickEntity(viewer, [
+                [urlST, tileStyleFloor]
+            ])
+
+            $("#blankCheckbox")[0].disabled = true
+            $("#blankCheckbox")[0].checked = false
+
+        }
+    })
+
+    $("#RoomId").bind("click", function () {
+        var selectValue = $(this).val();
+        $("#blankCheckbox")[0].disabled = false
+        var RoomArray = selectValue.split('0')
+        var floorNo = RoomArray[0]
+        let tileStyleFloor = set3DTileStyle("floor", floorNo)
+        addPickEntity(viewer, [
+            [urlST, tileStyleFloor]
+
+        ])
+    })
+
+    $("#blankCheckbox").click(function () {
+        if ($(this).prop("checked")) {
+            removeAllTiles(viewer);
+            var RoomArray = RoomId.split('0')
+            var floorNo = RoomArray[0]
+            let tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
+            let tileStyleFloor = set3DTileStyle("floor", floorNo)
+            addPickEntity(viewer, [
+                [urlST, tileStyleFloor],
+                [urlCQ, tileStyleRoom]
+            ])
+        } else {
+            removeAllTiles(viewer);
+            var RoomArray = RoomId.split('-')
+            var floorNo = RoomArray[0]
+            let tileStyleFloor = set3DTileStyle("floor", floorNo)
+            addPickEntity(viewer, [
+                [urlST, tileStyleFloor]
+
+            ])
+        }
+    })
+
+    function initView(viewer, urlST) {
+        var selectValue = $("#RoomId").val()
+        $("#blankCheckbox")[0].disabled = false
+        var RoomArray = selectValue.split('-')
+        var floorNo = RoomArray[0]
+        let tileStyleFloor = set3DTileStyleSTFloor("floor", floorNo)
+        addPickEntity(viewer, [
+            [urlST, tileStyleFloor]
+        ])
+    }
+
+    function add3DtilesNoStyle(viewer, url) {
+        var tileset = viewer.scene.primitives.add(
+            new Cesium.Cesium3DTileset({
+                url: url
+            })
+        )
+        tileset.readyPromise.then(function (model) {
+            viewer.zoomTo(tileset)
+        })
+    }
+    function add3DTilesetData(viewer, url) {
+        let isAdded = get3DTilesData(viewer, url)
+        if (isAdded != undefined) {
+        }
+        else {
+            var tileset = new Cesium.Cesium3DTileset({
+                url: url
+            });
+            viewer.scene.primitives.add(tileset)
+
+            var selectValue = $("#RoomId").val()
+            $("#blankCheckbox")[0].disabled = false
+            var RoomArray = selectValue.split('0')
+            var floorNo = RoomArray[0]
+           // tileset.style = set3DTileStyleSTFloor("floor", floorNo)
+            viewer.zoomTo(tileset)
+        }
+    }
+    function get3DTilesData(viewer, url) {
+        let tileset
+        let primitives = viewer.scene.primitives
+        for (let i = 0; i < primitives.length; i++) {
+            if (primitives._primitives[i]._url == url) {
+                tileset = primitives._primitives[i]
+            }
+        }
+        return tileset
+    }
+    function removeAllTiles(viewer) {
+        var primitives = viewer.scene.primitives
+        for (var i = primitives.length - 1; i > -1; i--) {
+
+            viewer.scene.primitives.remove(primitives._primitives[i])
+
+        }
+    }
+    function remove3dtiles(viewer, url) {
+        let isAdded = get3DTilesData(viewer, url)
+        if (isAdded != undefined) {//说明存在，存在就移除
+            var primitives = viewer.scene.primitives
+            for (var i = 0; i < primitives.length; i++) {
+                if (primitives._primitives[i]._url == url) {
+                    viewer.scene.primitives.remove(primitives._primitives[i])
+                }
+            }
+        } else {
+            console.log("当前场景中不存在此数据")
+        }
+
+    }
+    function addPickEntity(viewer, settingList) {
+        if (viewer && settingList.length == 1) {
+
+            removeAllTiles(viewer)
+            for (let item of settingList) {
+                add3Dtiles(viewer, item[0], item[1])
+            }
+        } else if (viewer && settingList.length == 2) {
+
+            removeAllTiles(viewer)
+            // remove3dtiles(viewer, settingList[1])
+            for (let item of settingList) {
+                add3Dtiles(viewer, item[0], item[1])
+            }
+        }
+    }
+    function add3Dtiles(viewer, url, style) {
+        var tileset = viewer.scene.primitives.add(
+            new Cesium.Cesium3DTileset({
+                url: url
+            })
+        )
+        tileset.style = style
+        tileset.readyPromise.then(function (model) {
+            // var center = Matrix4.multiplyByPoint(model.modelMatrix, model.boundingSphere.center, new Cartesian3())
+            // var hpr = new HeadingPitchRange(0.0, -0.5, model.boundingSphere.radius)
+            // viewer.camera.lookAt(center, hpr)
+            viewer.zoomTo(tileset, new HeadingPitchRange(0, -1, tileset.boundingSphere.radius))
+            let position = tileset.boundingSphere.center
+            let catographic = Cartographic.fromCartesian(position, viewer.scene.globe.ellipsoid)
+            catographic.height = tileset.boundingSphere.radius * 1.5
+            CesiumNavigation.terria.options.defaultResetView = catographic
+        })
+    }
+    function set3DTileStyle(queryField, selectValues) {
+        //if (selectValues.length === 0) return
+        let conditions = []
+        var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
+        var cond = [selectcontent, 'rgb(255,255,255)']
+        conditions.push(cond)
+        let cond_end = ['true', 'rgba(255,165,188,0.002)']
+        conditions.push(cond_end)
+        var transparentStyle = new Cesium.Cesium3DTileStyle({
+            color: {
+                conditions: conditions
+            }
+        })
+        return transparentStyle
+    }
+    function set3DTileStyleSTFloor(queryField, selectValues) {
+        let conditions = []
+        var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
+        var cond = [selectcontent, 'rgba(255,0,0,0.2)']
+        conditions.push(cond)
+        let cond_end = ['true', 'rgb(255,255,255)']
+        conditions.push(cond_end)
+        var transparentStyle = new Cesium.Cesium3DTileStyle({
+            color: {
+                conditions: conditions
+            }
+        })
+        return transparentStyle
+    }
+</script>
+
+

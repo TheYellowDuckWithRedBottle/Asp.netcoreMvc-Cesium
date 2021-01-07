@@ -1,0 +1,166 @@
+﻿@{ Layout = null;
+    ViewData["Title"] = "地图"; }
+@model List<RealEstate>
+    <environment include="Development">
+        <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+        <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/Cesium.js"></script>
+        <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+        <script src="~/js/index.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
+        <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/Cesium.js"></script>
+        <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+        <script src="~/js/index.min.js"></script>
+    </environment>
+    <div style="background:white;margin:20px 10px 0px 20px;position:absolute;z-index:4">
+        @foreach (var item in Model)
+        {
+            <div id="Nos">@item.BuildingNo</div>
+            <div id="RoomId">@item.RoomId</div>}
+    </div>
+    <div id="cesiumContainer">
+        <div style="position:absolute; z-index:3">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var viewer = init1(Cesium);
+        console.log(CLASSIF_MODEL_URLS)
+        var BuildingNo = document.getElementById("Nos").innerHTML
+        var RoomId = document.getElementById("RoomId").innerHTML
+        var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
+        var Tiles = add3DTilesetData(viewer, urlCQ);
+        for (let i of CLASSIF_MODEL_URLS) {
+
+            add3DTilesetData(viewer, i)
+        }
+
+        function add3DtilesNoStyle(viewer, url) {
+            var tileset = viewer.scene.primitives.add(
+                new Cesium.Cesium3DTileset({
+                    url: url
+                })
+            )
+            tileset.readyPromise.then(function (model) {
+                viewer.zoomTo(tileset)
+            })
+        }
+        function add3DTilesetData(viewer, url) {
+            let isAdded = get3DTilesData(viewer, url)
+            if (isAdded != undefined) {
+                console.log("当前数据已加载")
+            }
+            else {
+                console.log("还未加载数据")
+                var tileset = new Cesium.Cesium3DTileset({
+                    url: url
+                });
+                viewer.scene.primitives.add(tileset)
+
+                viewer.zoomTo(tileset)
+                tileset.loadProgress.addEventListener(function (numberOfPendingRequests, numberOfTilesProcessing) {
+                    if ((numberOfPendingRequests === 0) && (numberOfTilesProcessing === 0)) {
+                        console.log('Stopped loading');
+                        return;
+                    }
+                });
+                tileset.readyPromise.then(function (tileset) {
+                    viewer.zoomTo(tileset)
+                    var properties = tileset.properties;
+                    if (Cesium.defined(properties)) {
+                        for (var name in properties) {
+                            console.log(properties[name]);
+                        }
+                    } if (url == XINYI_CLASSIF_MODEL_DOWN_URL) {
+                        tileset.style = XINYI_CLASSIF_MODEL_STYLE
+                    }
+                });
+            }
+        }
+        function get3DTilesData(viewer, url) {
+            let tileset
+            let primitives = viewer.scene.primitives
+            for (let i = 0; i < primitives.length; i++) {
+                if (primitives._primitives[i]._url == url) {
+                    tileset = primitives._primitives[i]
+                }
+            }
+            return tileset
+        }
+        function removeAllTiles(viewer) {
+            var primitives = viewer.scene.primitives
+            for (var i = primitives.length - 1; i > -1; i--) {
+
+                viewer.scene.primitives.remove(primitives._primitives[i])
+
+            }
+        }
+        function remove3dtiles(viewer, url) {
+            let isAdded = get3DTilesData(viewer, url)
+            if (isAdded != undefined) {//说明存在，存在就移除
+                var primitives = viewer.scene.primitives
+                for (var i = 0; i < primitives.length; i++) {
+                    if (primitives._primitives[i]._url == url) {
+                        viewer.scene.primitives.remove(primitives._primitives[i])
+                    }
+                }
+            } else {
+                console.log("当前场景中不存在此数据")
+            }
+
+        }
+        function addPickEntity(viewer, settingList) {
+            if (viewer && settingList.length == 1) {
+
+                removeAllTiles(viewer)
+                for (let item of settingList) {
+                    add3Dtiles(viewer, item[0], item[1])
+                }
+            } else if (viewer && settingList.length == 2) {
+                removeAllTiles(viewer)
+                for (let item of settingList) {
+                    add3Dtiles(viewer, item[0], item[1])
+                }
+            }
+        }
+        function add3Dtiles(viewer, url, style) {
+            var tileset = viewer.scene.primitives.add(
+                new Cesium.Cesium3DTileset({
+                    url: url
+                })
+            )
+            tileset.style = style
+            tileset.readyPromise.then(function (model) {
+                // var center = Matrix4.multiplyByPoint(model.modelMatrix, model.boundingSphere.center, new Cartesian3())
+                // var hpr = new HeadingPitchRange(0.0, -0.5, model.boundingSphere.radius)
+                // viewer.camera.lookAt(center, hpr)
+                viewer.zoomTo(tileset, new HeadingPitchRange(0, -1, tileset.boundingSphere.radius))
+                let position = tileset.boundingSphere.center
+                let catographic = Cartographic.fromCartesian(position, viewer.scene.globe.ellipsoid)
+                catographic.height = tileset.boundingSphere.radius * 1.5
+                CesiumNavigation.terria.options.defaultResetView = catographic
+            })
+        }
+        function set3DTileStyle(queryField, selectValues) {
+            //if (selectValues.length === 0) return
+            let conditions = []
+            var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
+            var cond = [selectcontent, 'rgb(255,255,255)']
+            conditions.push(cond)
+            let cond_end = ['true', 'rgba(255,165,188,0.002)']
+            conditions.push(cond_end)
+            var transparentStyle = new Cesium.Cesium3DTileStyle({
+                color: {
+                    conditions: conditions
+                }
+            })
+            return transparentStyle
+        }
+
+    </script>
+
+
