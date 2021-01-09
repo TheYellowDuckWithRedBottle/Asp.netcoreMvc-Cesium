@@ -1,0 +1,72 @@
+{
+  "_args": [
+    [
+      "es6-cesium-navigation@1.0.5",
+      "G:\\3D_display_system_of_natural_resources2"
+    ]
+  ],
+  "_from": "es6-cesium-navigation@1.0.5",
+  "_id": "es6-cesium-navigation@1.0.5",
+  "_inBundle": false,
+  "_integrity": "sha512-LOUMTekk5K9x+AMaikerHGUUp0zRSA7a7R+q6PQLs8SxIF0mVHXyr+mtwk9pP+FmUkBROim2ZpBjcxijGv6BbA==",
+  "_location": "/es6-cesium-navigation",
+  "_phantomChildren": {
+    "clone": "2.1.2",
+    "errno": "0.1.7",
+    "graceful-fs": "4.2.4",
+    "image-size": "0.5.5",
+    "make-dir": "2.1.0",
+    "mime": "1.6.0",
+    "promise": "7.3.1",
+    "request": "2.88.2",
+    "source-map": "0.6.1",
+    "tslib": "1.13.0"
+  },
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "es6-cesium-navigation@1.0.5",
+    "name": "es6-cesium-navigation",
+    "escapedName": "es6-cesium-navigation",
+    "rawSpec": "1.0.5",
+    "saveSpec": null,
+    "fetchSpec": "1.0.5"
+  },
+  "_requiredBy": [
+    "/vue-cesium"
+  ],
+  "_resolved": "https://registry.npmjs.org/es6-cesium-navigation/-/es6-cesium-navigation-1.0.5.tgz",
+  "_spec": "1.0.5",
+  "_where": "G:\\3D_display_system_of_natural_resources2",
+  "author": {
+    "name": "richard, zouyaoji",
+    "email": "370681295@qq.com",
+    "url": "https://github.com/zouyaoji"
+  },
+  "bugs": {
+    "url": "https://github.com/zouyaoji/es6-cesium-navigation/issues"
+  },
+  "dependencies": {
+    "hammerjs": "^2.0.8",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
+    "markdown-it": "^8.4.2",
+    "markdown-it-sanitizer": "^0.4.3"
+  },
+  "description": "es6-cesium-navigation",
+  "homepage": "https://github.com/zouyaoji/es6-cesium-navigation",
+  "keywords": [
+    "cesium-navigation"
+  ],
+  "license": "ISC",
+  "main": "viewerCesiumNavigationMixin.js",
+  "name": "es6-cesium-navigation",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zouyaoji/es6-cesium-navigation.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.5"
+}

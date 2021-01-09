@@ -2,15 +2,17 @@
    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzZDMwNTQ3ZC0xYjE5LTQ5MTUtYmM4ZC0yOTgwYTg4ZDA0N2EiLCJpZCI6MTQwNzcsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjQ3MDg4OTJ9.YUsZDqZPckX3GwlCCuqfoOVZokwMKdySqrkVgKUv5dA';
     
     var imageryProvider = new Cesium.UrlTemplateImageryProvider({
-        url: "http://localhost:6060/Data/BASE_DATA/IMAGE/{Z}/{X}/{Y}.png",
+        url: "http://47.111.250.87:8080/DATA/Img/{z}/{x}/{y}.png",
         tilingScheme: new Cesium.WebMercatorTilingScheme(),
         fileExtension: 'png',
         minimumLevel: 0,
         maximumLevel: 13
     })
+
     var viewer = new Cesium.Viewer('cesiumContainer', {
         animation: false, 
         baseLayerPicker: false, 
+        imageryProvider: imageryProvider,
         geocoder: false, 
         timeline: false, 
         sceneModePicker: false, 
@@ -27,25 +29,31 @@
         fullscreenButton: false,
         infoBox: false
     });
-    viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0);
-    viewer.scene.undergroundMode = true;
-    viewer.scene.backgroundColor = new Cesium.Color(1, 1, 1, 0);
-    viewer.scene.globe.depthTestAgainstTerrain = true;
-    viewer.scene.logarithmicDepthBuffer = false;
+
+   
+    //viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0);
+    //viewer.scene.undergroundMode = true;
+    //viewer.scene.backgroundColor = new Cesium.Color(1, 1, 1, 0);
+    //viewer.scene.globe.depthTestAgainstTerrain = true;
+    //viewer.scene.logarithmicDepthBuffer = false;
 
     viewer._cesiumWidget._creditContainer.style.display = 'none'
-    viewer.scene.skyBox.show = false
-    viewer.scene.sun.show = false
-    viewer.scene.moon.show = false
-    viewer.scene.globe.show = false
-    viewer.scene.skyAtmosphere.show = false
-    viewer.scene.globe.depthTestAgainstTerrain = false
-    viewer.scene.globe.enableLighting = false
+    //viewer.scene.skyBox.show = false
+    //viewer.scene.sun.show = false
+    //viewer.scene.moon.show = false
+    //viewer.scene.globe.show = false
+    //viewer.scene.skyAtmosphere.show = false
+    //viewer.scene.globe.depthTestAgainstTerrain = false
+    //viewer.scene.globe.enableLighting = false
     return viewer;
 }
 function init1(Cesium) {
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzZDMwNTQ3ZC0xYjE5LTQ5MTUtYmM4ZC0yOTgwYTg4ZDA0N2EiLCJpZCI6MTQwNzcsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NjQ3MDg4OTJ9.YUsZDqZPckX3GwlCCuqfoOVZokwMKdySqrkVgKUv5dA';
     var viewer;
+    let imageryProvider = new Cesium.UrlTemplateImageryProvider({
+        url: 'http://localhost:5052/DATA/Img/{z}/{x}/{y}.png', //服务地址
+        
+    });
     viewer = new Cesium.Viewer('cesiumContainer', {
         terrainExaggeration: 0.95,
         //imageryProvider: imageryProvider,
@@ -64,7 +72,9 @@ function init1(Cesium) {
      viewer._cesiumWidget._creditContainer.style.display = 'none'
     viewer.scene.globe.showGroundAtmosphere = false
     viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0) //修改地球颜色
-   
+
+
+
     viewer.camera.setView({
         // Cesium的坐标是以地心为原点，一向指向南美洲，一向指向亚洲，一向指向北极州
         // fromDegrees()方法，将经纬度和高程转换为世界坐标
@@ -100,19 +110,10 @@ function add3DTilesetData(viewer, url,style) {
         });
         tileset.style=style
         viewer.scene.primitives.add(tileset)
-
         addListener(tileset)
-        viewer.zoomTo(tileset)
-        tileset.loadProgress.addEventListener(function (numberOfPendingRequests, numberOfTilesProcessing) {
-            if ((numberOfPendingRequests === 0) && (numberOfTilesProcessing === 0)) {
-                return;
-            }
-        });
         tileset.readyPromise.then(function (tileset) {
-            // tile.properties is not defined until readyPromise resolves.
             viewer.zoomTo(tileset)
             var properties = tileset.properties;
-            console.log(properties)
             if (Cesium.defined(properties)) {
                 for (var name in properties) {
                     console.log(name)
@@ -155,19 +156,10 @@ function remove3dtiles(viewer, url) {
 }
 function addPickEntity(viewer, settingList) {
     if (viewer && settingList.length == 1) {
-
-        removeAllTiles(viewer)
         for (let item of settingList) {
             add3Dtiles(viewer, item[0], item[1])
         }
-    } else if (viewer && settingList.length == 2) {
-
-        removeAllTiles(viewer)
-        // remove3dtiles(viewer, settingList[1])
-        for (let item of settingList) {
-            add3Dtiles(viewer, item[0], item[1])
-        }
-    }
+    } 
 }
 function add3Dtiles(viewer, url, style) {
     var tileset = viewer.scene.primitives.add(
@@ -189,7 +181,7 @@ function set3DTileStyle(queryField, selectValues) {
     var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
     var cond = [selectcontent, 'rgb(255,255,255)']
     conditions.push(cond)
-    let cond_end = ['true', 'rgba(255,165,188,0.002)']
+    let cond_end = ['true', 'rgba(0,0,0,0.002)']
     conditions.push(cond_end)
     var transparentStyle = new Cesium.Cesium3DTileStyle({
         color: {
@@ -206,7 +198,7 @@ function addListener(tileset) {
         console.log("选中的要素", pickFeature)
         if (pickFeature) {
              selectFeature(pickFeature,tileset)
-            //getAllProperty(pickFeature)
+            getAllProperty(pickFeature)
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -275,7 +267,6 @@ function colorByDistance() {
     },
     )
 }
-
 
 function hideByHeight() {
     tileset.style = new Cesium.Cesium3DTileStyle({

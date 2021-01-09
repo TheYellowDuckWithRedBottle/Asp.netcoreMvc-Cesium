@@ -17,6 +17,7 @@ namespace WebApplication3.Controllers
         {
             this._savOperateService = saveOperate;
         }
+        //首登验证
         [HttpPost]
         async public Task<ActionResult> IsAllowRegister([FromQuery]string token,[FromQuery]string guid,[FromBody]ParamsModel bdcdyhList)
         {
@@ -43,7 +44,7 @@ namespace WebApplication3.Controllers
             var Result = await proxy.RuleCheck(postIsAllowCheck);
             return Ok(Result);
         }
-
+        //首登提交
         [HttpPost]
         async public Task<ActionResult> RegisterCreateInterface([FromQuery] string token,[FromQuery] string guid, [FromBody] ParamsModel bdcdyhList)
         {
@@ -82,6 +83,7 @@ namespace WebApplication3.Controllers
             var Result = await proxy.CreateWorkFlow(postIsAllowCheck);
             return Ok(Result);
         }
+        //三维添加
         [HttpPost]
          public ActionResult PostView([FromBody] ParamJson paramsJson)
         {

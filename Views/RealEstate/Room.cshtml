@@ -1,12 +1,11 @@
 ﻿@{ Layout = null;
-    ViewData["Title"] = "地图"; }
-@model RealEstate
+    ViewData["Title"] = "房产"; }
+@model Mapping
 <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
 <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 <script src="~/js/Cesium.js"></script>
 <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
-<script src="~/js/viewerCesiumNavigationMixin.js"></script>
 <script src="~/js/index.js"></script>
 
 <environment include="Development">
@@ -49,51 +48,43 @@
     var viewer = init(Cesium);
     var BuildingNo = document.getElementById("Nos").value
     var RoomId = document.getElementById("RoomId").value
-    var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
-    var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
-    var RoomArray = RoomId.split('0')
+    var urlST = `http://47.111.250.87:8080/DATA/SWDJ/321300/001013GB00858/ST/${BuildingNo}/tileset.json`
+    var urlCQ = `http://47.111.250.87:8080/DATA/SWDJ/321300/001013GB00858/CQ/${BuildingNo}/tileset.json`
+    var RoomArray = RoomId.split('-')
 
     var floorNo = RoomArray[0]
 
-    var StyleST = set3DTileStyle("floor", floorNo)
-    var StyleCQ = set3DTileStyle("NameOverride", RoomId)
+    var StyleST = set3DTileStyle("Floor", floorNo)
+    var StyleCQ = set3DTileStyle("name", RoomId)
     add3DTilesetData(viewer, urlST, StyleST);
     add3DTilesetData(viewer, urlCQ, StyleCQ);
 
 
-    $("#RoomId").bind("click", function () {
+    $("#RoomId").bind("click",function () {
         var selectValue = $(this).val();
         console.log(selectValue)
-        $("#blankCheckbox")[0].disabled = false
+        $("#blankCheckbox")[0].disabled=false
         var RoomArray = selectValue.split('-')
         var floorNo = RoomArray[0]
-        let tileStyleFloor = set3DTileStyle("floor", floorNo)
+        console.log(floorNo)
+        let tileStyleFloor = set3DTileStyle("Floor", floorNo)
         addPickEntity(viewer, [
             [urlST, tileStyleFloor]
-
         ])
 
     })
     $("#blankCheckbox").click(function () {
         if ($(this).prop("checked")) {
-            removeAllTiles(viewer);
             var selectValue = $("#RoomId").val();
             var RoomArray = selectValue.split('-')
             var floorNo = selectValue[0]
-            let tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
-            let tileStyleFloor = set3DTileStyle("floor", floorNo)
+            let tileStyleRoom = set3DTileStyle("name", RoomId)
             addPickEntity(viewer, [
-                [urlST, tileStyleFloor],
                 [urlCQ, tileStyleRoom]
             ])
         } else {
-            removeAllTiles(viewer);
-            var RoomArray = RoomId.split('-')
-            var floorNo = RoomArray[0]
-            let tileStyleFloor = set3DTileStyle("floor", floorNo)
-            addPickEntity(viewer, [
-                [urlST, tileStyleFloor]
-            ])
+            remove3dtiles(viewer, urlCQ)
+           
         }
     })
 </script>

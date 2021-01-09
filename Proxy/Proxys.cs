@@ -13,8 +13,8 @@ namespace WebApplication3.Proxy
 {
     public class Proxys
     {
-        private string HostIp = "http://192.168.188.97:8030";
-        public string Tokendomain = "/account/oauth/token?grant_type=password&client_id=storageUI&client_secret=dOffl1LGmnm4CTW0jDOv&username=ld&password=123456";
+        private string HostIp = "http://192.168.188.130:8030";
+        public string Tokendomain = "/account/oauth/token?grant_type=password&client_id=storageUI&client_secret=dOffl1LGmnm4CTW0jDOv&username=ld&password=Ld1234";
         private string tokenUrl;
         private string RequestUrl = "";
         public string token { get; set; }
@@ -26,6 +26,7 @@ namespace WebApplication3.Proxy
         {
             this.RequestUrl = this.HostIp+_RuquestUrl;
         }
+        //获取token
       async  public Task<string> getToken()
         {
             using (var httpClient = new HttpClient())

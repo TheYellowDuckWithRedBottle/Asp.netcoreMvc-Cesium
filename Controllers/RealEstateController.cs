@@ -48,7 +48,17 @@ namespace WebApplication3.Controllers
             if (mapping == null) return Ok(new ReturnModel() { Code = 404, Msg = "未查到此房号" });
             else return View(mapping);
         }
-       
-    
+        [HttpGet]
+        public IActionResult Room([FromQuery] string RealEstateNo)
+        {
+            if (string.IsNullOrEmpty(RealEstateNo))
+                return NotFound();
+            var mappingService = new MappingService();
+            var mapping = mappingService.GetHouseHold(RealEstateNo);
+            if (mapping == null) return Ok(new ReturnModel() { Code = 404, Msg = "未查到此房号" });
+            else return View(mapping);
+        }
+
+
     }
 }

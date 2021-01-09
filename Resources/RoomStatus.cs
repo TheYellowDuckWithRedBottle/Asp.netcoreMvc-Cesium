@@ -12,7 +12,7 @@ namespace WebApplication3.Resources
         public string BuildingNo { get; set; }
         public void DeleteSameModel()
         {
-           this.MortgageList= this.MortgageList.Except(this.SealList).ToList();
+           this.SealList = this.SealList.Except(this.MortgageList).ToList();
         }
     }
 }

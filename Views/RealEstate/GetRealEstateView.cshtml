@@ -7,6 +7,7 @@
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/Cesium.js"></script>
         <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
+        <script src="~/js/es6-cesium-navigation/viewerCesiumNavigationMixin.js" type="module"></script>
         <script src="~/js/index.js"></script>
     </environment>
     <environment exclude="Development">
@@ -27,7 +28,7 @@
             <label class="form-check-label" for="RoomId">房间号:@Model.RoomId</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input position-static" type="checkbox" id="blankCheckbox" disabled>
+            <input class="form-check-input position-static" type="checkbox" id="blankCheckbox" checked>
             <label class="form-check-label" for="blankCheckbox">产权</label>
         </div>
     </nav>
@@ -37,65 +38,67 @@
     </div>
     <script type="text/javascript">
         var viewer = init(Cesium);
+        //var options = {};
+        //// 用于在使用重置导航重置地图视图时设置默认视图控制。接受的值是Cesium.Cartographic 和Cesium.Rectangle.
+        //options.defaultResetView = new Cesium.Cartographic.fromDegrees(110, 30, 2000000);
+        //// 用于启用或禁用罗盘。true是启用罗盘，false是禁用罗盘。默认值为true。如果将选项设置为false，则罗盘将不会添加到地图中。
+        //options.enableCompass = true;
+        //// 用于启用或禁用缩放控件。true是启用，false是禁用。默认值为true。如果将选项设置为false，则缩放控件 将不会添加到地图中。
+        //options.enableZoomControls = true;
+        //// 用于启用或禁用距离图例。true是启用，false是禁用。默认值为true。如果将选项设置为false，距离图例将不会添加到地图中。
+        //options.enableDistanceLegend = true;
+        //// 用于启用或禁用指南针外环。true是启用，false是禁用。默认值为true。如果将选项设置为false，则该环将可见但无效。
+        //options.enableCompassOuterRing = true;
+
+        //viewer.extend(Cesium.CesiumNavigation, options);
+
         var BuildingNo = document.getElementById("Nos").value
         var RoomId = document.getElementById("RoomId").value
         var floor
         //var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
         //var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
-        var urlST = `http://localhost:5052/DATA/SWDJ/321300/001013GB00858/ST/${BuildingNo}/tileset.json`
-        var urlCQ = `http://localhost:5052/DATA/SWDJ/321300/001013GB00858/CQ/${BuildingNo}/tileset.json`
+        var urlST = `http://47.111.250.87:8080/DATA/SWDJ/321300/001013GB00858/ST/${BuildingNo}/tileset.json`
+        var urlCQ = `http://47.111.250.87:8080/DATA/SWDJ/321300/001013GB00858/CQ/${BuildingNo}/tileset.json`
         var Tiles = add3DTilesetData(viewer, urlST);
-        //var Tiles = add3DTilesetData(viewer, urlCQ);
-       
+        let tileStyleRoom = set3DTileStyle("name", RoomId)
+        add3Dtiles(viewer, urlCQ, tileStyleRoom)  
         $("#Nos").click(function () {
             {
-                removeAllTiles(viewer);
-                add3DTilesetData(viewer, urlST);
-                $("#blankCheckbox")[0].disabled = true
-                $("#blankCheckbox")[0].checked = false
-
+                //remove3dtiles(viewer, urlCQ)
+                add3DtilesNoStyle(viewer, urlST);
+               // $("#blankCheckbox")[0].disabled = true
+                //$("#blankCheckbox")[0].checked = false
             }
         })
         $("#RoomId").bind("click", function () {
             var selectValue = $(this).val();
             $("#blankCheckbox")[0].disabled = false
+            remove3dtiles(viewer, urlST)
             //var RoomArray = selectValue.split('0')
             var RoomArray = selectValue.split('-')
+            console.log(BuildingNo)
+            if (BuildingNo == "0004") {
+                console.log(RoomArray)
+                var floorNo = RoomArray[1]
+                floor = -floorNo
+            }
             var floorNo = RoomArray[0]
-            floor=floorNo
-           
             console.log(floorNo)
             let tileStyleFloor = set3DTileStyle("Floor", floorNo)
-            addPickEntity(viewer, [
-                [urlST, tileStyleFloor]
-
-            ])
-
+            add3Dtiles(viewer, urlST, tileStyleFloor)
+           
         })
 
         $("#blankCheckbox").click(function () {
             if ($(this).prop("checked")) {
-                removeAllTiles(viewer);
-                //var RoomArray = RoomId.split('0')
-              
-                console.log(RoomId)
-               // var floorNo = RoomArray[0]
-               // let tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
+                var selectValue = $("#RoomId").val();
+                var RoomArray = selectValue.split('-')
+                var floorNo = selectValue[0]
                 let tileStyleRoom = set3DTileStyle("name", RoomId)
-                let tileStyleFloor = set3DTileStyle("Floor", floor)
-                addPickEntity(viewer, [
-                    [urlST, tileStyleFloor],
-                    [urlCQ, tileStyleRoom]
-                ])
+                add3Dtiles(viewer, urlCQ, tileStyleRoom)
+              
             } else {
-                removeAllTiles(viewer);
-                var RoomArray = RoomId.split('-')
-                var floorNo = RoomArray[0]
-                let tileStyleFloor = set3DTileStyle("floor", floorNo)
-                addPickEntity(viewer, [
-                    [urlST, tileStyleFloor]
-
-                ])
+                remove3dtiles(viewer, urlCQ)
             }
         })
     </script>
