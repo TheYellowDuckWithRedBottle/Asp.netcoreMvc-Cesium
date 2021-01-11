@@ -11,7 +11,6 @@ namespace WebApplication3.Services
     public class MappingService
     {
         private readonly IMongoCollection<Mapping> _Mapping;
-       
         public MappingService()
         {
             //var ConnectString = configuration.GetConnectionString("DefaultConnection");

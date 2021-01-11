@@ -34,7 +34,6 @@ namespace WebApplication3.Controllers
         [HttpGet]
         public IActionResult RealEstateNo([FromQuery]string RealEstateNo)
         {
-  
                 if (string.IsNullOrEmpty(RealEstateNo))
                 // return View(new ReturnModel() { Code = 404, Msg = "输入参数为空" });
                 return Ok(new ReturnModel() { Code = 404, Msg = "输入参数为空" });  

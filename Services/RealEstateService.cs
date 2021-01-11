@@ -28,6 +28,7 @@ namespace WebApplication3.Services
             var filterBuilder = Builders<RealEstate>.Filter;
             FilterDefinition<RealEstate> filter = filterBuilder.Eq("RealEstateNo", EstateNo);
             var mapping = _RealEstate.Find(filter).FirstOrDefault();
+           
             return mapping;
         }
         public RealEstate GetOne(string BuildingNo, string RoomId)
