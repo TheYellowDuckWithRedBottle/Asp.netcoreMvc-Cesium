@@ -193,6 +193,7 @@ namespace WebApplication3.Controllers
         public ActionResult GetStatus([FromQuery] string token, [FromBody] ParamsModel RealEstateNos)
         {
             List<RoomStatus> roomStatuses = new List<RoomStatus>();
+            MappingService mappingService = new MappingService();
             foreach (var item in RealEstateNos.RealEstateNos)
             {
                 RoomStatus roomStatus = new RoomStatus();
@@ -201,7 +202,8 @@ namespace WebApplication3.Controllers
                 roomStatus.SealList = ConvertToSealString(token, queryString);//查询查封List
                 //roomStatus.DeleteSameModel();
                 var Mapping=_realEstateService.GetHouseHold(item);
-                roomStatus.BuildingNo = Mapping.BuildingNo;
+                var mapping= mappingService.GetHouseHold(item);
+                roomStatus.BuildingNo = mapping.BuildingNo;
                 roomStatuses.Add(roomStatus);
             }  
             return Ok(roomStatuses);
