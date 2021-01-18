@@ -125,26 +125,36 @@
             var BuildingNo = document.getElementById("Nos").value
             var RoomId = document.getElementById("RoomId").value
             var floor
-            //var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
-            //var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
+          
             var urlST = `http://47.111.250.87:8080/Data/SWDJ/321300/001013GB00858/ST/${BuildingNo}/tileset.json`
             var urlCQ = `http://47.111.250.87:8080/Data/SWDJ/321300/001013GB00858/CQ/${BuildingNo}/tileset.json`
-            var Tiles = add3DTilesetData(viewer, urlST);
+            var urlFL = `http://47.111.250.87:8080/Data/SWDJ/321300/001013GB00858/FL/${BuildingNo}/tileset.json`
+
+            add3DTilesetData(viewer, urlST);//添加实体
+
+            
+            //let tileStyleRoom = set3DTileStyle("name", RoomId)
+            //console.log(tileStyleRoom)
+            //add3Dtiles(viewer, urlCQ, tileStyleRoom)//添加产权
             let tileStyleRoom = set3DTileStyle("name", RoomId)
             add3Dtiles(viewer, urlCQ, tileStyleRoom)
+           
+            let tileStyleFL = set3DTileForFLStyle("roomid", RoomId)
+            console.log(tileStyleFL)
+            add3Dtiles(viewer, urlFL, tileStyleFL)
             $("#Nos").click(function () {
                 {
-                    //remove3dtiles(viewer, urlCQ)
                     add3DtilesNoStyle(viewer, urlST);
-                    //$("#blankCheckbox")[0].disabled = true
-                    //$("#blankCheckbox")[0].checked = false
+                    //add3Dtiles(viewer, urlFL, tileFLStyle);
+                    
                 }
             })
             $("#RoomId").bind("click", function () {
                 var selectValue = $(this).val();
                 $("#blankCheckbox")[0].disabled = false
                 remove3dtiles(viewer, urlST)
-                //var RoomArray = selectValue.split('0')
+               
+                remove3dtiles(viewer, urlFL)
                 var RoomArray = selectValue.split('-')
                 console.log(BuildingNo)
                 if (BuildingNo == "0004") {
@@ -156,7 +166,7 @@
                 console.log(floorNo)
                 let tileStyleFloor = set3DTileStyle("Floor", floorNo)
                 add3Dtiles(viewer, urlST, tileStyleFloor)
-
+                
             })
 
             $("#blankCheckbox").click(function () {

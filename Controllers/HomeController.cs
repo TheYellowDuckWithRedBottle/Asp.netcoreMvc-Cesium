@@ -34,13 +34,26 @@ namespace WebApplication3.Controllers
         [HttpGet]
         public IActionResult RealEstateNo([FromQuery]string RealEstateNo)
         {
+            MappingService mappingService = new MappingService();
                 if (string.IsNullOrEmpty(RealEstateNo))
                 // return View(new ReturnModel() { Code = 404, Msg = "输入参数为空" });
                 return Ok(new ReturnModel() { Code = 404, Msg = "输入参数为空" });  
-                var mapping = _realEstateService.GetHouseHold(RealEstateNo);
+                var mapping = mappingService.GetHouseHold(RealEstateNo);
                 if (mapping == null) return  Ok(new ReturnModel() { Code = 404, Msg = "未查找到房号" });
                 else return View(mapping); 
         }
+        [HttpGet]
+        public IActionResult RoomId([FromQuery] string RealEstateNo)
+        {
+            MappingService mappingService = new MappingService();
+            if (string.IsNullOrEmpty(RealEstateNo))
+                // return View(new ReturnModel() { Code = 404, Msg = "输入参数为空" });
+                return Ok(new ReturnModel() { Code = 404, Msg = "输入参数为空" });
+            var mapping = mappingService.GetHouseHold(RealEstateNo);
+            if (mapping == null) return Ok(new ReturnModel() { Code = 404, Msg = "未查找到房号" });
+            else return Ok(mapping);
+        }
+
         public IActionResult Room([FromQuery]string RealEstateNo)
         {
             if (string.IsNullOrEmpty(RealEstateNo))

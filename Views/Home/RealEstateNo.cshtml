@@ -1,6 +1,6 @@
 ﻿@{ Layout = null;
     ViewData["Title"] = "地图"; }
-@model RealEstate
+@model Mapping
 <script src="~/lib/jquery-2.0.3/jquery-2.0.3/jquery-2.0.3.min.js"></script>
 <link href="~/lib/bootstrap-3.0.3-dist/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
@@ -9,6 +9,7 @@
 <link href="~/lib/Cesium/Widgets/widgets.css" rel="stylesheet" />
 <script src="~/js/lib/require.min.js"></script>
 <script src="~/js/index.js"></script>
+<script src="~/js/es6-cesium-navigation/viewerCesiumNavigationMixin.js"></script>
 
 <nav role="navigation" class="navbar bg-dark " style="background:white;margin:20px 10px 0px 20px;position:absolute;z-index:4">
     <div class="form-check">
@@ -16,11 +17,11 @@
         <label style="font-size:30px;" class="form-check-label" for="Nos">幢:@Model.BuildingNo</label>
     </div>
     <div class="form-check form-check-inline">
-        <input id="RoomId" class="form-check-input" hidden type="radio" name="exampleRadios" value="@Model.RoomId">
-        <label style="font-size:30px;" class="form-check-label" for="RoomId"></label>
+        <input id="RoomId" class="form-check-input"  type="radio" name="exampleRadios" value="@Model.RoomId">
+        <label style="font-size:30px;" class="form-check-label" for="RoomId">幢:@Model.RoomId</label>
     </div>
     <div class="form-check form-check-inline">
-        <input class="form-check-input position-static" hidden type="checkbox" id="blankCheckbox" disabled>
+        <input class="form-check-input position-static"  type="checkbox" id="blankCheckbox" disabled>
         <label style="font-size:30px;" class="form-check-label" for="blankCheckbox"></label>
     </div>
 </nav>
@@ -33,9 +34,22 @@
     var viewer = init(Cesium);
     var BuildingNo = document.getElementById("Nos").value
     var RoomId = document.getElementById("RoomId").value
-    var urlCQ = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
-    var urlST = `http://localhost:6060/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
-    var Tiles = add3DTilesetData(viewer, urlST);
+    var ReturnSTModel = ReturnSTModel()
+    //var urlCQ = `http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/CQ/${BuildingNo}/tileset.json`
+    //var urlST = `http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/ST/${BuildingNo}/tileset.json`
+    //var urlFL = `http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/FL/${BuildingNo}/tileset.json`
+    var urlCQ = "http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/CQ/"+BuildingNo+"/tileset.json"
+    var urlST = "http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/ST/"+BuildingNo+"/tileset.json"
+    var urlFL = "http://222.184.234.26:5064/Data/SWDJ/320602/010025GB03200/FL"+BuildingNo+"/tileset.json"
+
+
+
+    addClassification3Dtiles(viewer, urlFL);
+
+    for (var i = 0; i < ReturnSTModel.length; i++) {
+        add3DTilesetData(viewer, ReturnSTModel[i])
+    }
+    
     //var Tiles = initView(viewer, urlST);
     $("#Nos").click(function () {
         {
@@ -44,10 +58,8 @@
             $("#blankCheckbox")[0].disabled = false
             var RoomArray = selectValue.split('0')
             var floorNo = RoomArray[0]
-            let tileStyleFloor = set3DTileStyleSTFloor("floor", floorNo)
-            addPickEntity(viewer, [
-                [urlST, tileStyleFloor]
-            ])
+            var tileStyleFloor = set3DTileStyleSTFloor("floor", floorNo)
+            add3Dtiles(viewer, urlST, tileStyleFloor)
 
             $("#blankCheckbox")[0].disabled = true
             $("#blankCheckbox")[0].checked = false
@@ -60,7 +72,7 @@
         $("#blankCheckbox")[0].disabled = false
         var RoomArray = selectValue.split('0')
         var floorNo = RoomArray[0]
-        let tileStyleFloor = set3DTileStyle("floor", floorNo)
+        var tileStyleFloor = set3DTileStyle("floor", floorNo)
         addPickEntity(viewer, [
             [urlST, tileStyleFloor]
 
@@ -72,8 +84,8 @@
             removeAllTiles(viewer);
             var RoomArray = RoomId.split('0')
             var floorNo = RoomArray[0]
-            let tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
-            let tileStyleFloor = set3DTileStyle("floor", floorNo)
+            var tileStyleRoom = set3DTileStyle("NameOverride", RoomId)
+            var tileStyleFloor = set3DTileStyle("floor", floorNo)
             addPickEntity(viewer, [
                 [urlST, tileStyleFloor],
                 [urlCQ, tileStyleRoom]
@@ -82,7 +94,7 @@
             removeAllTiles(viewer);
             var RoomArray = RoomId.split('-')
             var floorNo = RoomArray[0]
-            let tileStyleFloor = set3DTileStyle("floor", floorNo)
+            var tileStyleFloor = set3DTileStyle("floor", floorNo)
             addPickEntity(viewer, [
                 [urlST, tileStyleFloor]
 
@@ -112,7 +124,7 @@
         })
     }
     function add3DTilesetData(viewer, url) {
-        let isAdded = get3DTilesData(viewer, url)
+        var isAdded = get3DTilesData(viewer, url)
         if (isAdded != undefined) {
         }
         else {
@@ -125,14 +137,14 @@
             $("#blankCheckbox")[0].disabled = false
             var RoomArray = selectValue.split('0')
             var floorNo = RoomArray[0]
-           // tileset.style = set3DTileStyleSTFloor("floor", floorNo)
+            // tileset.style = set3DTileStyleSTFloor("floor", floorNo)
             viewer.zoomTo(tileset)
         }
     }
     function get3DTilesData(viewer, url) {
-        let tileset
-        let primitives = viewer.scene.primitives
-        for (let i = 0; i < primitives.length; i++) {
+        var tileset
+        var primitives = viewer.scene.primitives
+        for (var i = 0; i < primitives.length; i++) {
             if (primitives._primitives[i]._url == url) {
                 tileset = primitives._primitives[i]
             }
@@ -148,7 +160,7 @@
         }
     }
     function remove3dtiles(viewer, url) {
-        let isAdded = get3DTilesData(viewer, url)
+        var isAdded = get3DTilesData(viewer, url)
         if (isAdded != undefined) {//说明存在，存在就移除
             var primitives = viewer.scene.primitives
             for (var i = 0; i < primitives.length; i++) {
@@ -165,14 +177,14 @@
         if (viewer && settingList.length == 1) {
 
             removeAllTiles(viewer)
-            for (let item of settingList) {
+            for (var item of settingList) {
                 add3Dtiles(viewer, item[0], item[1])
             }
         } else if (viewer && settingList.length == 2) {
 
             removeAllTiles(viewer)
             // remove3dtiles(viewer, settingList[1])
-            for (let item of settingList) {
+            for (var item of settingList) {
                 add3Dtiles(viewer, item[0], item[1])
             }
         }
@@ -189,19 +201,19 @@
             // var hpr = new HeadingPitchRange(0.0, -0.5, model.boundingSphere.radius)
             // viewer.camera.lookAt(center, hpr)
             viewer.zoomTo(tileset, new HeadingPitchRange(0, -1, tileset.boundingSphere.radius))
-            let position = tileset.boundingSphere.center
-            let catographic = Cartographic.fromCartesian(position, viewer.scene.globe.ellipsoid)
+            var position = tileset.boundingSphere.center
+            var catographic = Cartographic.fromCartesian(position, viewer.scene.globe.ellipsoid)
             catographic.height = tileset.boundingSphere.radius * 1.5
             CesiumNavigation.terria.options.defaultResetView = catographic
         })
     }
     function set3DTileStyle(queryField, selectValues) {
         //if (selectValues.length === 0) return
-        let conditions = []
+        var conditions = []
         var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
         var cond = [selectcontent, 'rgb(255,255,255)']
         conditions.push(cond)
-        let cond_end = ['true', 'rgba(255,165,188,0.2)']
+        var cond_end = ['true', 'rgba(255,165,188,0.2)']
         conditions.push(cond_end)
         var transparentStyle = new Cesium.Cesium3DTileStyle({
             color: {
@@ -211,11 +223,11 @@
         return transparentStyle
     }
     function set3DTileStyleSTFloor(queryField, selectValues) {
-        let conditions = []
+        var conditions = []
         var selectcontent = '${' + queryField + "} === '" + selectValues + "'"
         var cond = [selectcontent, 'rgba(255,0,0,0.2)']
         conditions.push(cond)
-        let cond_end = ['true', 'rgb(255,255,255)']
+        var cond_end = ['true', 'rgb(255,255,255)']
         conditions.push(cond_end)
         var transparentStyle = new Cesium.Cesium3DTileStyle({
             color: {
